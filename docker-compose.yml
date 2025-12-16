@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Service Base de Données
+  mongo:
+    image: mongo:latest
+    container_name: payload-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    # Commande optionnelle pour configurer le replica set (souvent requis par les transactions Payload)
+    # command: ["--replSet", "rs0", "--bind_ip_all"]
+
+  # Service Payload CMS
+  payload:
+    build: .
+    container_name: payload-app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      # L'hôte est "mongo" (le nom du service ci-dessus), pas "localhost"
+      - DATABASE_URI=mongodb://mongo:27017/payload-cms
+      # Remplacez ceci par une chaîne aléatoire complexe
+      - PAYLOAD_SECRET=VOTRE_SECRET_TRES_LONG_ET_SECURISE
+    volumes:
+      # Synchronisation pour le développement (Hot Reload)
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mongo-data:
