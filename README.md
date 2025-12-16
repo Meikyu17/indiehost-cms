@@ -1,67 +1,266 @@
-# Payload Blank Template
+# IndieHost CMS - Blog Management System
 
-This template comes configured with the bare minimum to get started on anything you need.
+Gestionnaire d'articles de blog construit avec Payload CMS, conçu pour être utilisé comme backend headless pour une page vitrine.
 
-## Quick start
+## Vue d'ensemble
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+Ce projet fournit une API de gestion de contenu (CMS headless) basée sur Payload CMS et Next.js. Il permet de créer, gérer et publier des articles de blog qui peuvent être consommés par n'importe quel frontend via l'API REST ou GraphQL.
 
-## Quick Start - local setup
+### Fonctionnalités principales
 
-To spin up this template locally, follow these steps:
+- Interface d'administration Payload CMS intuitive
+- Gestion d'articles de blog avec éditeur riche (Lexical)
+- Gestion de médias (upload d'images)
+- API REST et GraphQL auto-générées
+- Authentification utilisateur sécurisée
+- Base de données MongoDB
 
-### Clone
+---
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+## Installation depuis zéro
 
-### Development
+### Prérequis
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URI` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+Avant de commencer, assurez-vous d'avoir installé sur votre machine :
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+- [Node.js](https://nodejs.org/) (version 18.20.2+ ou 20.9.0+)
+- [pnpm](https://pnpm.io/) (version 9 ou 10)
+- [Docker](https://www.docker.com/) et Docker Compose (pour MongoDB)
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+### Étape 1 : Cloner le repository
 
-#### Docker (Optional)
+```bash
+git clone <url-du-repo>
+cd IndieHost-CMS
+```
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+### Étape 2 : Configuration de l'environnement
 
-To do so, follow these steps:
+Créez un fichier `.env` à la racine du projet avec le contenu suivant :
 
-- Modify the `MONGODB_URI` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URI` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+```env
+# Database
+DATABASE_URI=mongodb://127.0.0.1:27017/indiehost-blog
 
-## How it works
+# Payload
+PAYLOAD_SECRET=your-secret-key-change-this-in-production
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+# Next.js
+NODE_ENV=development
+```
 
-### Collections
+**Important :** Changez `PAYLOAD_SECRET` par une chaîne aléatoire sécurisée pour la production.
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+### Étape 3 : Démarrer la base de données MongoDB
 
-- #### Users (Authentication)
+Supprimez la ligne `version: '3'` du fichier `docker-compose.yml` (elle est obsolète), puis lancez MongoDB :
 
-  Users are auth-enabled collections that have access to the admin panel.
+```bash
+docker-compose up -d
+```
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+Cette commande démarre un conteneur MongoDB en arrière-plan.
 
-- #### Media
+### Étape 4 : Installer les dépendances
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+```bash
+pnpm install
+```
 
-### Docker
+### Étape 5 : Lancer l'application en mode développement
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+```bash
+pnpm dev
+```
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+### Étape 6 : Créer votre premier utilisateur admin
 
-## Questions
+1. Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur
+2. Suivez les instructions à l'écran pour créer votre compte administrateur
+3. Connectez-vous au panel d'administration
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+---
+
+## Utilisation
+
+### Interface d'administration
+
+- **Panel admin** : [http://localhost:3000/admin](http://localhost:3000/admin)
+- Créez vos articles, gérez les médias et les utilisateurs depuis cette interface
+
+### API REST
+
+L'API REST est automatiquement générée et accessible sur :
+
+- Articles : `http://localhost:3000/api/posts`
+- Médias : `http://localhost:3000/api/media`
+- Utilisateurs : `http://localhost:3000/api/users`
+
+Documentation complète : [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+### API GraphQL
+
+L'API GraphQL est disponible sur :
+
+- Endpoint : `http://localhost:3000/api/graphql`
+- Playground : `http://localhost:3000/api/graphql-playground`
+
+### Consommer l'API depuis votre frontend
+
+Exemple de requête pour récupérer tous les articles :
+
+```javascript
+// REST API
+const response = await fetch('http://localhost:3000/api/posts')
+const data = await response.json()
+
+// GraphQL
+const query = `
+  query {
+    Posts {
+      docs {
+        id
+        title
+        content
+        createdAt
+      }
+    }
+  }
+`
+```
+
+---
+
+## Scripts disponibles
+
+```bash
+pnpm dev          # Démarre le serveur de développement
+pnpm build        # Compile l'application pour la production
+pnpm start        # Démarre le serveur de production
+pnpm lint         # Vérifie le code avec ESLint
+pnpm payload      # CLI Payload pour les opérations avancées
+```
+
+---
+
+## Migration de données MongoDB
+
+### Exporter les données depuis une autre machine
+
+Sur la machine source :
+
+```bash
+# Si MongoDB tourne dans Docker
+docker exec -it indiehost-cms-mongo-1 mongodump --db=indiehost-blog --out=/dump
+docker cp indiehost-cms-mongo-1:/dump ./mongodb_backup
+
+# Compresser le backup
+tar -czf mongodb_backup.tar.gz mongodb_backup
+```
+
+### Importer les données sur cette machine
+
+Après avoir transféré le fichier `mongodb_backup.tar.gz` :
+
+```bash
+# Décompresser
+tar -xzf mongodb_backup.tar.gz
+
+# Importer dans Docker
+docker cp ./mongodb_backup/indiehost-blog indiehost-cms-mongo-1:/dump
+docker exec -it indiehost-cms-mongo-1 mongorestore --db=indiehost-blog /dump/indiehost-blog
+```
+
+---
+
+## Structure du projet
+
+```
+IndieHost-CMS/
+├── src/
+│   ├── app/              # Next.js App Router
+│   ├── collections/      # Collections Payload (Posts, Media, Users)
+│   ├── payload.config.ts # Configuration Payload CMS
+│   └── ...
+├── public/               # Fichiers statiques
+├── docker-compose.yml    # Configuration MongoDB
+├── .env                  # Variables d'environnement (à créer)
+└── package.json
+```
+
+---
+
+## Collections Payload CMS
+
+### Posts (Articles)
+
+Collection pour gérer les articles de blog avec :
+- Titre
+- Contenu riche (éditeur Lexical)
+- Image de couverture
+- Date de publication
+- Statut (brouillon/publié)
+
+### Media
+
+Collection pour gérer les uploads de médias :
+- Images avec redimensionnement automatique
+- Point focal personnalisable
+- Métadonnées
+
+### Users
+
+Collection d'authentification pour les administrateurs du CMS.
+
+---
+
+## Production
+
+### Build pour la production
+
+```bash
+pnpm build
+pnpm start
+```
+
+### Variables d'environnement pour la production
+
+Assurez-vous de modifier ces variables dans votre `.env` de production :
+
+- `PAYLOAD_SECRET` : Utilisez une clé secrète forte et unique
+- `NEXT_PUBLIC_SERVER_URL` : URL publique de votre serveur
+- `DATABASE_URI` : URI de votre base MongoDB de production
+- `NODE_ENV=production`
+
+---
+
+## Dépannage
+
+### Erreur : "cross-env n'est pas reconnu"
+
+Lancez `pnpm install` pour installer toutes les dépendances.
+
+### Erreur : "env file not found"
+
+Créez un fichier `.env` à la racine du projet avec les variables nécessaires (voir Étape 2).
+
+### MongoDB ne démarre pas
+
+Vérifiez que Docker est en cours d'exécution et que le port 27017 n'est pas déjà utilisé :
+
+```bash
+docker ps
+```
+
+---
+
+## Support
+
+Pour toute question ou problème :
+
+- [Documentation Payload CMS](https://payloadcms.com/docs)
+- [Discord Payload](https://discord.com/invite/payload)
+- [GitHub Issues](https://github.com/payloadcms/payload/discussions)
