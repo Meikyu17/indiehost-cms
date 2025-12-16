@@ -193,6 +193,10 @@ export interface Article {
   author?: (string | null) | User;
   publishedDate?: string | null;
   status?: ('draft' | 'published') | null;
+  /**
+   * Les articles épinglés apparaîtront en premier dans la liste
+   */
+  pinned?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -345,6 +349,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   author?: T;
   publishedDate?: T;
   status?: T;
+  pinned?: T;
   updatedAt?: T;
   createdAt?: T;
 }

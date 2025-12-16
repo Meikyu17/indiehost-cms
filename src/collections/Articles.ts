@@ -52,5 +52,15 @@ export const Articles: CollectionConfig = {
       ],
       defaultValue: 'draft',
     },
+    {
+      name: 'pinned',
+      type: 'checkbox',
+      label: 'Épingler cet article',
+      defaultValue: false,
+      admin: {
+        description: 'Les articles épinglés apparaîtront en premier dans la liste',
+        position: 'sidebar',
+      },
+    },
   ],
 }
