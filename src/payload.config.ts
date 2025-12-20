@@ -21,6 +21,7 @@ const whitelist = [
   'http://localhost:5173', // Vue.js (Vite) en développement
   'http://localhost:3000', // Payload en local
   'http://localhost:8080', // Vue.js (alternative)
+  'http://172.17.0.1:3000', // n8n pour communiquer avec Payload
   process.env.NEXT_PUBLIC_SERVER_URL, // URL publique du CMS
   process.env.FRONTEND_URL, // URL de votre frontend
 ].filter((val): val is string => Boolean(val)) // Type guard pour garantir que ce sont des strings

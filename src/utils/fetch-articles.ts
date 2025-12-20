@@ -1,9 +1,37 @@
+// Types pour le contenu Lexical
+interface LexicalNode {
+  type: string
+  text?: string
+  children?: LexicalNode[]
+}
+
+interface LexicalContent {
+  root?: {
+    children?: LexicalNode[]
+  }
+}
+
+interface Article {
+  title: string
+  status: string
+  publishedDate: string
+  content: LexicalContent
+  featuredImage?: {
+    url: string
+  }
+}
+
+interface ArticlesResponse {
+  docs: Article[]
+  totalDocs: number
+}
+
 // Fonction pour extraire le texte brut depuis Lexical
-function extractText(lexicalContent: any): string {
+function extractText(lexicalContent: LexicalContent): string {
   if (!lexicalContent?.root?.children) return ''
 
   let text = ''
-  function traverse(nodes: any[]) {
+  function traverse(nodes: LexicalNode[]) {
     for (const node of nodes) {
       if (node.type === 'text') {
         text += node.text
@@ -19,11 +47,11 @@ function extractText(lexicalContent: any): string {
 
 async function fetchArticles() {
   const response = await fetch('http://localhost:3000/api/articles')
-  const data = await response.json()
+  const data = (await response.json()) as ArticlesResponse
 
   console.log('=== ARTICLES ===\n')
 
-  data.docs.forEach((article: any, index: number) => {
+  data.docs.forEach((article: Article, index: number) => {
     console.log(`${index + 1}. ${article.title}`)
     console.log(`   Statut: ${article.status}`)
     console.log(`   Date: ${article.publishedDate}`)
