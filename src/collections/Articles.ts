@@ -15,6 +15,16 @@ export const Articles: CollectionConfig = {
       required: true,
     },
     {
+      name: 'excerpt',
+      type: 'textarea',
+      required: false,
+      maxLength: 200,
+      admin: {
+        description: "Résumé court de l'article (max 200 caractères)",
+        placeholder: 'Entrez un court résumé qui sera affiché dans les aperçus...',
+      },
+    },
+    {
       name: 'content',
       type: 'richText', // Utilise l'éditeur Lexical
       required: true,
