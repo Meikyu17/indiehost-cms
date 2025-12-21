@@ -15,6 +15,31 @@ export const Articles: CollectionConfig = {
       required: true,
     },
     {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      admin: {
+        description: "URL de l'article (généré automatiquement à partir du titre)",
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            if (!value && data?.title) {
+              return data.title
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Supprime les accents
+                .replace(/[^a-z0-9]+/g, '-') // Remplace les caractères spéciaux par des tirets
+                .replace(/^-+|-+$/g, '') // Supprime les tirets en début et fin
+            }
+            return value
+          },
+        ],
+      },
+    },
+    {
       name: 'excerpt',
       type: 'textarea',
       required: false,
